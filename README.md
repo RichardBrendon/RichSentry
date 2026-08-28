@@ -17,6 +17,7 @@ RichSentry is a production-minded website and API monitoring SaaS built with Nex
 - Configurable failure and recovery confirmation
 - Automatic incident creation and resolution
 - Protected, batched monitor worker triggered by Supabase Cron, with per-monitor locking
+- Immediate first check when a monitor is created and an authenticated dashboard heartbeat as a free fallback
 - Structured secret-free logs, security headers and critical-rule tests
 
 ## Architecture
@@ -52,6 +53,8 @@ For the first account, create an organization and an OWNER membership row in Sup
 Import the repository into the free Vercel Hobby plan, add every variable from `.env.example`, and deploy. There are no Vercel Cron Jobs in this project.
 
 After deployment, run `supabase/migrations/002_enable_free_scheduler.sql` and then customize and run `supabase/setup-free-scheduler.sql` in the Supabase SQL Editor. The latter stores the deployed worker URL and `MONITOR_WORKER_SECRET` in Supabase Vault and asks Supabase Cron to call the protected worker once per minute. Each invocation claims up to 20 due monitors and ignores stale locks after two minutes.
+
+New monitors are checked immediately. While an authenticated dashboard is open, it also processes due monitors once per minute as a fallback. Supabase Cron is still required for continuous checks while nobody has the dashboard open.
 
 This setup requires no paid subscription. It remains subject to the quotas and fair-use rules of Vercel Hobby and Supabase Free. Supabase may pause a free project after one week without activity; an actively monitoring project ordinarily continues receiving scheduled database activity, but the free tier does not provide an uptime SLA.
 
