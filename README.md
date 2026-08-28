@@ -16,17 +16,17 @@ RichSentry is a production-minded website and API monitoring SaaS built with Nex
 - DNS validation on every request and redirect; maximum three redirects
 - Configurable failure and recovery confirmation
 - Automatic incident creation and resolution
-- Protected, batched Vercel Cron worker with per-monitor locking
+- Protected, batched monitor worker triggered by Supabase Cron, with per-monitor locking
 - Structured secret-free logs, security headers and critical-rule tests
 
 ## Architecture
 
-The App Router owns pages and thin route handlers. Monitoring logic lives under `src/lib/monitoring`, validation under `src/lib/schemas`, and database clients under `src/lib/supabase`. PostgreSQL RLS is the final authorization boundary. The service role is server-only and limited to the cron worker.
+The App Router owns pages and thin route handlers. Monitoring logic lives under `src/lib/monitoring`, validation under `src/lib/schemas`, and database clients under `src/lib/supabase`. PostgreSQL RLS is the final authorization boundary. The service role is server-only and limited to the monitor worker.
 
 ```text
 User → Monitor API → PostgreSQL
                        ↓
-Vercel Cron → due batch → SSRF-safe HTTP check
+Supabase Cron → worker endpoint → due batch → SSRF-safe HTTP check
                        ↓
               history + state transition
                        ↓
@@ -37,7 +37,7 @@ Vercel Cron → due batch → SSRF-safe HTTP check
 
 1. Install Node.js 20+ and run `npm install`.
 2. Create a Supabase project and run `supabase/migrations/001_initial.sql` in its SQL editor.
-3. Copy `.env.example` to `.env.local` and fill the Supabase keys and a long random `CRON_SECRET`.
+3. Copy `.env.example` to `.env.local` and fill the Supabase keys and a long random `MONITOR_WORKER_SECRET`.
 4. Enable email/password authentication in Supabase.
 5. Run `npm run dev` and open `http://localhost:3000`.
 
@@ -45,11 +45,15 @@ For the first account, create an organization and an OWNER membership row in Sup
 
 ## Environment
 
-`NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` are browser configuration. `SUPABASE_SERVICE_ROLE_KEY` and `CRON_SECRET` are server secrets and must never use the `NEXT_PUBLIC_` prefix.
+`NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` are browser configuration. `SUPABASE_SERVICE_ROLE_KEY` and `MONITOR_WORKER_SECRET` are server secrets and must never use the `NEXT_PUBLIC_` prefix.
 
-## Vercel
+## Free deployment and scheduling
 
-Import the repository, add every variable from `.env.example`, and deploy. `vercel.json` invokes `/api/cron/monitor` every minute. Vercel sends `Authorization: Bearer <CRON_SECRET>`. Each invocation claims up to 20 due monitors and ignores stale locks after two minutes.
+Import the repository into the free Vercel Hobby plan, add every variable from `.env.example`, and deploy. There are no Vercel Cron Jobs in this project.
+
+After deployment, run `supabase/migrations/002_enable_free_scheduler.sql` and then customize and run `supabase/setup-free-scheduler.sql` in the Supabase SQL Editor. The latter stores the deployed worker URL and `MONITOR_WORKER_SECRET` in Supabase Vault and asks Supabase Cron to call the protected worker once per minute. Each invocation claims up to 20 due monitors and ignores stale locks after two minutes.
+
+This setup requires no paid subscription. It remains subject to the quotas and fair-use rules of Vercel Hobby and Supabase Free. Supabase may pause a free project after one week without activity; an actively monitoring project ordinarily continues receiving scheduled database activity, but the free tier does not provide an uptime SLA.
 
 ## Security
 
