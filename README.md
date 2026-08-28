@@ -1,36 +1,64 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# RichSentry
 
-## Getting Started
+**Know when your services fail. Before your users do.**
 
-First, run the development server:
+RichSentry is a production-minded website and API monitoring SaaS built with Next.js, Supabase and Vercel. It performs HTTP checks on the server, records latency and availability, confirms failures before opening incidents, and isolates resources by organization.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Included
+
+- Professional landing page, authentication screens and responsive observability dashboard
+- Supabase authentication foundation and persistent cookie sessions
+- Multi-organization PostgreSQL schema with OWNER, ADMIN, MEMBER and VIEWER roles
+- Row Level Security policies for tenant isolation
+- Authenticated monitor REST API and paginated check history
+- Real HTTP/HTTPS monitoring with timeout, status and latency thresholds
+- SSRF protection for private, loopback, link-local and metadata addresses
+- DNS validation on every request and redirect; maximum three redirects
+- Configurable failure and recovery confirmation
+- Automatic incident creation and resolution
+- Protected, batched Vercel Cron worker with per-monitor locking
+- Structured secret-free logs, security headers and critical-rule tests
+
+## Architecture
+
+The App Router owns pages and thin route handlers. Monitoring logic lives under `src/lib/monitoring`, validation under `src/lib/schemas`, and database clients under `src/lib/supabase`. PostgreSQL RLS is the final authorization boundary. The service role is server-only and limited to the cron worker.
+
+```text
+User → Monitor API → PostgreSQL
+                       ↓
+Vercel Cron → due batch → SSRF-safe HTTP check
+                       ↓
+              history + state transition
+                       ↓
+                 incident lifecycle
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Setup
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Install Node.js 20+ and run `npm install`.
+2. Create a Supabase project and run `supabase/migrations/001_initial.sql` in its SQL editor.
+3. Copy `.env.example` to `.env.local` and fill the Supabase keys and a long random `CRON_SECRET`.
+4. Enable email/password authentication in Supabase.
+5. Run `npm run dev` and open `http://localhost:3000`.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+For the first account, create an organization and an OWNER membership row in Supabase. A later onboarding transaction can automate this bootstrap.
 
-## Learn More
+## Environment
 
-To learn more about Next.js, take a look at the following resources:
+`NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` are browser configuration. `SUPABASE_SERVICE_ROLE_KEY` and `CRON_SECRET` are server secrets and must never use the `NEXT_PUBLIC_` prefix.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Vercel
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Import the repository, add every variable from `.env.example`, and deploy. `vercel.json` invokes `/api/cron/monitor` every minute. Vercel sends `Authorization: Bearer <CRON_SECRET>`. Each invocation claims up to 20 due monitors and ignores stale locks after two minutes.
 
-## Deploy on Vercel
+## Security
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Input is validated with Zod and ownership is enforced by RLS. Checks reject credentials in URLs, non-HTTP protocols, reserved IP ranges, internal suffixes and cloud metadata hosts. Each redirect is resolved and validated again. Sensitive headers are never returned by list APIs or logged. Before handling real secrets, add KMS-backed encryption for the `encrypted_headers` column.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Verification
+
+Run `npm run lint`, `npm test`, and `npm run build`. Demo values are confined to presentation pages and never seed production automatically.
+
+## Roadmap
+
+The service boundaries are ready for signed webhooks, email delivery, SSL expiry checks, public status pages, scheduled maintenance, retention aggregation, Stripe billing and a public token-authenticated API.

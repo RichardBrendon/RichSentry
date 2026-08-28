@@ -1,69 +1,21 @@
-import Image from "next/image";
+import Link from "next/link";
+import { ArrowRight, Check, Globe2, Radio, ShieldCheck, Webhook } from "lucide-react";
+
+const features = [
+  [Globe2, "Website & API monitoring", "HTTP checks from the server, with status-code and latency validation."],
+  [Radio, "Incident confirmation", "Configurable failure and recovery thresholds cut through transient noise."],
+  [ShieldCheck, "Security by default", "SSRF-safe requests, tenant isolation and protected scheduled jobs."],
+  [Webhook, "Alerts that travel", "A delivery pipeline ready for signed webhooks, email and future integrations."],
+] as const;
 
 export default function Home() {
-  return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
-  );
+  return <main>
+    <nav className="nav shell"><Link className="brand" href="/"><span>R</span> RichSentry</Link><div className="navlinks"><a href="#product">Product</a><a href="#features">Features</a><a href="#pricing">Pricing</a><a href="#docs">Docs</a></div><div className="navActions"><Link href="/login" className="textButton">Sign in</Link><Link href="/signup" className="button">Start monitoring</Link></div></nav>
+    <section className="hero shell" id="product"><div className="eyebrow"><i /> Infrastructure intelligence, without the noise</div><h1>Know when your services fail.<br/><em>Before your users do.</em></h1><p>RichSentry continuously watches websites and APIs, confirms real incidents, and gives your team the context to respond with confidence.</p><div className="heroActions"><Link href="/signup" className="button large">Start monitoring <ArrowRight size={16}/></Link><Link href="/dashboard" className="secondary large">View live demo</Link></div><div className="trust"><span><Check size={14}/> 2-minute setup</span><span><Check size={14}/> No credit card</span><span><Check size={14}/> Secure by default</span></div></section>
+    <section className="console shell" aria-label="RichSentry dashboard preview"><div className="consoleBar"><span className="brand small"><span>R</span> RichSentry</span><span>Production workspace</span><span className="live"><i/> Live</span></div><div className="consoleGrid"><aside><b>Overview</b><span>Monitors <small>12</small></span><span>Incidents <small>2</small></span><span>Status pages</span><hr/><span>Settings</span></aside><div className="consoleMain"><div className="dashHead"><div><small>OVERVIEW</small><h2>Infrastructure</h2></div><button>+ New monitor</button></div><div className="metrics"><article><small>MONITORS</small><strong>12</strong><span>10 operational</span></article><article><small>UPTIME · 30D</small><strong>99.97%</strong><span className="positive">+0.04%</span></article><article><small>AVG RESPONSE</small><strong>184 ms</strong><span>Across all monitors</span></article><article><small>ACTIVE INCIDENTS</small><strong>2</strong><span className="warning">Needs attention</span></article></div><div className="chart"><div className="chartTitle"><b>Response time</b><span>Last 24 hours</span></div><div className="bars">{[30,38,34,48,41,46,51,44,66,50,58,55,74,61,69,62,78,71,65,81,70,76,68,72].map((h,i)=><i key={i} style={{height:`${h}%`}}/>)}</div></div><div className="monitorRows"><div><span className="dot up"/><b>RichSentry Website</b><small>200 OK</small><strong>98 ms</strong></div><div><span className="dot up"/><b>Production API</b><small>200 OK</small><strong>143 ms</strong></div><div><span className="dot degraded"/><b>Authentication Service</b><small>Slow response</small><strong>1,248 ms</strong></div></div></div></div></section>
+    <section className="section shell" id="features"><div className="sectionIntro"><small>BUILT FOR RELIABILITY</small><h2>Everything between “it works” and “we know why.”</h2><p>Operational clarity without a maze of configuration.</p></div><div className="featureGrid">{features.map(([Icon,title,copy])=><article key={title}><Icon/><h3>{title}</h3><p>{copy}</p><a href="#docs">Explore feature <ArrowRight size={14}/></a></article>)}</div></section>
+    <section className="how shell"><small>HOW IT WORKS</small><div className="steps">{[["01","Add your endpoint","Choose a URL, interval, expected status and response threshold."],["02","We monitor it","Checks run securely on the server and every result becomes usable history."],["03","Act on signal","Confirmed failures create incidents and notify the right people."]].map(([n,t,d])=><article key={n}><b>{n}</b><h3>{t}</h3><p>{d}</p></article>)}</div></section>
+    <section className="pricing shell" id="pricing"><div className="sectionIntro"><small>SIMPLE PRICING</small><h2>Start small. Stay informed.</h2></div><div className="priceGrid">{[["Free","$0","For side projects","5 monitors · 7-day history"],["Pro","$19","For production teams","50 monitors · 90-day history"],["Team","$49","For growing organizations","200 monitors · 1-year history"]].map(([name,price,desc,items],i)=><article className={i===1?"featured":""} key={name}>{i===1&&<label>POPULAR</label>}<h3>{name}</h3><strong>{price}<small>/mo</small></strong><p>{desc}</p><span>{items}</span><Link className={i===1?"button":"secondary"} href="/signup">Start monitoring</Link></article>)}</div></section>
+    <footer className="shell" id="docs"><span className="brand small"><span>R</span> RichSentry</span><p>© 2026 RichSentry. Built for the uptime-obsessed.</p><div><a href="#product">Product</a><a href="#pricing">Pricing</a><a href="/login">Sign in</a></div></footer>
+  </main>
 }
