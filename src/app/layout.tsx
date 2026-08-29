@@ -8,6 +8,7 @@ import "./oauth.css";
 import "./dashboard-pages.css";
 import "./auth-email.css";
 import "./session.css";
+import "./demo.css";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 const geistSans = Geist({
