@@ -5,6 +5,7 @@ import "./app.css";
 import "./forms.css";
 import "./theme.css";
 import "./oauth.css";
+import "./dashboard-pages.css";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 const geistSans = Geist({
