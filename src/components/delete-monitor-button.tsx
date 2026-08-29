@@ -10,7 +10,11 @@ export function DeleteMonitorButton({ id, name }: { id: string; name: string }) 
   const [error, setError] = useState("");
 
   async function remove() {
-    if (!window.confirm(`Remove "${name}" and all of its check history?`)) return;
+    const portuguese = localStorage.getItem("richsentry-language") === "pt-BR";
+    const confirmation = portuguese
+      ? `Remover "${name}" e todo o seu histórico de verificações?`
+      : `Remove "${name}" and all of its check history?`;
+    if (!window.confirm(confirmation)) return;
     setDeleting(true);
     setError("");
 
@@ -18,11 +22,11 @@ export function DeleteMonitorButton({ id, name }: { id: string; name: string }) 
       const response = await fetch(`/api/monitors/${id}`, { method: "DELETE" });
       if (!response.ok) {
         const body = await response.json().catch(() => null);
-        throw new Error(body?.error?.message ?? "Could not remove this monitor.");
+        throw new Error(body?.error?.message ?? (portuguese ? "Não foi possível remover este monitor." : "Could not remove this monitor."));
       }
       router.refresh();
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Could not remove this monitor.");
+      setError(cause instanceof Error ? cause.message : portuguese ? "Não foi possível remover este monitor." : "Could not remove this monitor.");
       setDeleting(false);
     }
   }
