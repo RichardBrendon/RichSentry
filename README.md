@@ -7,7 +7,7 @@ RichSentry is a production-minded website and API monitoring SaaS built with Nex
 ## Included
 
 - Professional landing page, authentication screens and responsive observability dashboard
-- Supabase authentication foundation and persistent cookie sessions
+- Google OAuth authentication restricted to personal `@gmail.com` accounts, with persistent cookie sessions
 - Multi-organization PostgreSQL schema with OWNER, ADMIN, MEMBER and VIEWER roles
 - Row Level Security policies for tenant isolation
 - Authenticated monitor REST API and paginated check history
@@ -39,8 +39,10 @@ Supabase Cron → worker endpoint → due batch → SSRF-safe HTTP check
 1. Install Node.js 20+ and run `npm install`.
 2. Create a Supabase project and run `supabase/migrations/001_initial.sql` in its SQL editor.
 3. Copy `.env.example` to `.env.local` and fill the Supabase keys and a long random `MONITOR_WORKER_SECRET`.
-4. Enable email/password authentication in Supabase.
-5. Run `npm run dev` and open `http://localhost:3000`.
+4. In Google Auth Platform, create a Web OAuth client and add the Supabase callback URL shown in **Authentication → Providers → Google** as an authorized redirect URI.
+5. Enable the Google provider in Supabase using that client ID and secret. Disable new email/password signups in Supabase so the provider configuration matches the application policy.
+6. Add `http://localhost:3000/auth/callback` and `https://YOUR-APP.vercel.app/auth/callback` to the Supabase redirect allow list.
+7. Run `npm run dev` and open `http://localhost:3000`.
 
 For the first account, create an organization and an OWNER membership row in Supabase. A later onboarding transaction can automate this bootstrap.
 

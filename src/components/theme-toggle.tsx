@@ -1,0 +1,5 @@
+"use client";
+import {Moon,Sun} from "lucide-react";import {useSyncExternalStore} from "react";
+type Theme="light"|"dark";const eventName="richsentry-theme-change";
+function subscribe(callback:()=>void){window.addEventListener(eventName,callback);return()=>window.removeEventListener(eventName,callback)}function snapshot():Theme{return document.documentElement.dataset.theme==="dark"?"dark":"light"}function serverSnapshot():Theme{return "light"}
+export function ThemeToggle(){const theme=useSyncExternalStore(subscribe,snapshot,serverSnapshot);function toggle(){const next=theme==="dark"?"light":"dark";document.documentElement.dataset.theme=next;document.documentElement.style.colorScheme=next;localStorage.setItem("richsentry-theme",next);window.dispatchEvent(new Event(eventName))}return <button type="button" className="themeToggle" onClick={toggle} aria-label={`Switch to ${theme==="dark"?"light":"dark"} theme`} title={`Switch to ${theme==="dark"?"light":"dark"} theme`}>{theme==="dark"?<Sun aria-hidden="true"/>:<Moon aria-hidden="true"/>}<span>{theme==="dark"?"Light":"Dark"}</span></button>}

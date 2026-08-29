@@ -1,2 +1,2 @@
-import Link from "next/link";import { AuthForm } from "@/components/auth-form";
-export default function Signup(){return <main className="authPage"><Link className="brand" href="/"><span>R</span> RichSentry</Link><section><small>START MONITORING</small><h1>Your services deserve a sentry.</h1><p>Create your workspace and run your first secure check in minutes.</p><AuthForm mode="signup"/></section></main>}
+import Link from "next/link";import {GoogleAuthButton} from "@/components/google-auth-button";
+export default function Signup(){return <main className="authPage"><Link className="brand" href="/"><span>R</span> RichSentry</Link><section><small>START MONITORING</small><h1>Create your account with Gmail</h1><p>Your workspace is created automatically after your first Google sign-in.</p><GoogleAuthButton/></section></main>}
