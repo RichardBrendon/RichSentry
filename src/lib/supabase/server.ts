@@ -1,6 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
-import { isAllowedGoogleUser } from "@/lib/auth";
+import { isAllowedUser } from "@/lib/auth";
 
 export async function createClient() {
   const store = await cookies();
@@ -14,5 +14,5 @@ export async function requireUser() {
   const client = await createClient();
   if (!client) return { client: null, user: null };
   const { data: { user } } = await client.auth.getUser();
-  return { client, user: isAllowedGoogleUser(user) ? user : null };
+  return { client, user: isAllowedUser(user) ? user : null };
 }
