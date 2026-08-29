@@ -77,7 +77,7 @@ export function LanguageToggle() {
   function toggle() {
     const next = language === "en" ? "pt-BR" : "en";
     localStorage.setItem("richsentry-language", next);
-    setLanguage(next);
+    window.location.reload();
   }
 
   return <button data-no-translate type="button" className="languageToggle" onClick={toggle} aria-label={language === "en" ? "Mudar para português" : "Switch to English"} title={language === "en" ? "Mudar para português" : "Switch to English"}><Languages /><span>{language === "en" ? "PT-BR" : "EN"}</span></button>;
