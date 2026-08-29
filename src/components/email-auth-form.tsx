@@ -4,6 +4,7 @@ import Link from "next/link";
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { browserClient } from "@/lib/supabase/browser";
+import { appOrigin } from "@/lib/app-url";
 
 export function EmailAuthForm({ mode }: { mode: "login" | "signup" }) {
   const router = useRouter();
@@ -41,7 +42,7 @@ export function EmailAuthForm({ mode }: { mode: "login" | "signup" }) {
     const { data, error: signUpError } = await client.auth.signUp({
       email,
       password,
-      options: { emailRedirectTo: `${window.location.origin}/auth/callback?next=/dashboard` },
+      options: { emailRedirectTo: `${appOrigin(window.location.origin)}/auth/callback?next=/dashboard` },
     });
     if (signUpError) {
       setError(signUpError.message);

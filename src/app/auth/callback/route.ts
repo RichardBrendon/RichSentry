@@ -1,6 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { isAllowedGoogleUser } from "@/lib/auth";
+import { appOrigin } from "@/lib/app-url";
 
 function safeNextPath(value: string | null) {
   return value?.startsWith("/") && !value.startsWith("//")
@@ -12,7 +13,7 @@ export async function GET(request: NextRequest) {
   const code = request.nextUrl.searchParams.get("code");
   const flowId = request.nextUrl.searchParams.get("sb_flow_id");
   const next = safeNextPath(request.nextUrl.searchParams.get("next"));
-  const origin = request.nextUrl.origin;
+  const origin = appOrigin(request.nextUrl.origin);
 
   if (!code) {
     return NextResponse.redirect(new URL("/login?error=oauth_failed", origin));
