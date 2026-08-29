@@ -42,7 +42,7 @@ export function EmailAuthForm({ mode }: { mode: "login" | "signup" }) {
     const { data, error: signUpError } = await client.auth.signUp({
       email,
       password,
-      options: { emailRedirectTo: `${appOrigin(window.location.origin)}/auth/callback?next=/dashboard` },
+      options: { emailRedirectTo: `${appOrigin(window.location.origin)}/` },
     });
     if (signUpError) {
       setError(signUpError.message);

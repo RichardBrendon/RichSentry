@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { ArrowRight, Check, Globe2, Radio, ShieldCheck, Webhook } from "lucide-react";
 import { requireUser } from "@/lib/supabase/server";
 import { SignOutButton } from "@/components/sign-out-button";
@@ -10,7 +11,13 @@ const features = [
   [Webhook, "Alerts that travel", "A delivery pipeline ready for signed webhooks, email and future integrations."],
 ] as const;
 
-export default async function Home() {
+export default async function Home({ searchParams }: { searchParams: Promise<{ code?: string; sb_flow_id?: string }> }) {
+  const { code, sb_flow_id: flowId } = await searchParams;
+  if (code) {
+    const query = new URLSearchParams({ code, next: "/dashboard" });
+    if (flowId) query.set("sb_flow_id", flowId);
+    redirect(`/auth/callback?${query.toString()}`);
+  }
   const { user } = await requireUser();
   return <main>
     <nav className="nav shell"><Link className="brand" href="/"><span>R</span> RichSentry</Link><div className="navlinks"><a href="#product">Product</a><a href="#features">Features</a><a href="#pricing">Pricing</a><a href="#docs">Docs</a></div><div className="navActions">{user ? <><SignOutButton/><Link href="/dashboard" className="button">Open dashboard</Link></> : <><Link href="/login" className="textButton">Sign in</Link><Link href="/signup" className="button">Start monitoring</Link></>}</div></nav>
