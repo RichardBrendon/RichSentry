@@ -1,0 +1,8 @@
+.navBottom{margin-top:auto;display:flex;flex-direction:column;gap:4px}
+.appNav .navBottom .settings{margin-top:0}
+.navSignOut{display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;border:0;border-radius:5px;background:transparent;color:#8fa097;font:500 13px var(--font-geist-sans);cursor:pointer;text-align:left}
+.navSignOut:hover{background:#1c2d26;color:#fff}.navSignOut:disabled,.signOutButton:disabled{opacity:.55;cursor:wait}
+.navSignOut svg{width:16px;height:16px}
+.signOutButton{border:0;background:transparent;cursor:pointer;font:600 13px var(--font-geist-sans)}
+:root[data-theme="dark"] .signOutButton{color:var(--muted)}
+@media(max-width:600px){.navActions .signOutButton{display:none}}

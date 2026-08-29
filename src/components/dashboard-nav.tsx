@@ -6,6 +6,7 @@ import {
   Radio,
   Settings,
 } from "lucide-react";
+import { SignOutButton } from "@/components/sign-out-button";
 
 type DashboardNavProps = {
   active: "overview" | "monitors" | "incidents" | "status-pages" | "settings";
@@ -37,9 +38,7 @@ export function DashboardNav({
           <Activity /> Status pages
         </Link>
       </nav>
-      <Link className={`settings${active === "settings" ? " active" : ""}`} href="/dashboard/settings">
-        <Settings /> Settings
-      </Link>
+      <div className="navBottom"><Link className={`settings${active === "settings" ? " active" : ""}`} href="/dashboard/settings"><Settings /> Settings</Link><SignOutButton compact /></div>
     </aside>
   );
 }
