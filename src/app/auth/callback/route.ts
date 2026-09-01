@@ -50,6 +50,7 @@ export async function GET(request: NextRequest) {
       "location",
       new URL("/login?error=oauth_failed", origin).toString(),
     );
+
     return response;
   }
 

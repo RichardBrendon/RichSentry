@@ -17,10 +17,12 @@ export function EmailAuthForm({ mode }: { mode: "login" | "signup" }) {
     setLoading(true);
     setError("");
     setNotice("");
+
     const form = new FormData(event.currentTarget);
     const email = String(form.get("email") ?? "").trim();
     const password = String(form.get("password") ?? "");
     const client = browserClient();
+
     if (!client) {
       setError("Supabase is not configured.");
       setLoading(false);
@@ -28,12 +30,17 @@ export function EmailAuthForm({ mode }: { mode: "login" | "signup" }) {
     }
 
     if (mode === "login") {
-      const { error: signInError } = await client.auth.signInWithPassword({ email, password });
+      const { error: signInError } = await client.auth.signInWithPassword({
+        email,
+        password,
+      });
+
       if (signInError) {
         setError(signInError.message);
         setLoading(false);
         return;
       }
+
       router.push("/dashboard");
       router.refresh();
       return;
@@ -44,28 +51,72 @@ export function EmailAuthForm({ mode }: { mode: "login" | "signup" }) {
       password,
       options: { emailRedirectTo: `${appOrigin(window.location.origin)}/` },
     });
+
     if (signUpError) {
       setError(signUpError.message);
       setLoading(false);
       return;
     }
+
     if (data.session) {
       router.push("/dashboard");
       router.refresh();
     } else {
-      setNotice("Check your email and open the confirmation link to finish creating your account.");
+      setNotice(
+        "Check your email and open the confirmation link to finish creating your account.",
+      );
       setLoading(false);
     }
   }
 
-  return <>
-    <form className="authForm emailAuthForm" onSubmit={submit}>
-      {error && <p className="formError" role="alert">{error}</p>}
-      {notice && <p className="authNotice" role="status">{notice}</p>}
-      <label>Email<input name="email" type="email" autoComplete="email" required /></label>
-      <label>Password<input name="password" type="password" autoComplete={mode === "login" ? "current-password" : "new-password"} minLength={6} required /></label>
-      <button className="button" disabled={loading}>{loading ? "Please wait…" : mode === "login" ? "Sign in with email" : "Create account with email"}</button>
-    </form>
-    <p className="authSwitch">{mode === "login" ? <>New to RichSentry? <Link href="/signup">Create an account</Link></> : <>Already have an account? <Link href="/login">Sign in</Link></>}</p>
-  </>;
+  return (
+    <>
+      <form className="authForm emailAuthForm" onSubmit={submit}>
+        {error && (
+          <p className="formError" role="alert">
+            {error}
+          </p>
+        )}
+        {notice && (
+          <p className="authNotice" role="status">
+            {notice}
+          </p>
+        )}
+        <label>
+          Email
+          <input name="email" type="email" autoComplete="email" required />
+        </label>
+        <label>
+          Password
+          <input
+            name="password"
+            type="password"
+            autoComplete={
+              mode === "login" ? "current-password" : "new-password"
+            }
+            minLength={6}
+            required
+          />
+        </label>
+        <button className="button" disabled={loading}>
+          {loading
+            ? "Please wait…"
+            : mode === "login"
+              ? "Sign in with email"
+              : "Create account with email"}
+        </button>
+      </form>
+      <p className="authSwitch">
+        {mode === "login" ? (
+          <>
+            New to RichSentry? <Link href="/signup">Create an account</Link>
+          </>
+        ) : (
+          <>
+            Already have an account? <Link href="/login">Sign in</Link>
+          </>
+        )}
+      </p>
+    </>
+  );
 }

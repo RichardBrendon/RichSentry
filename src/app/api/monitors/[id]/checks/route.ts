@@ -1,2 +1,35 @@
-import { requireUser } from "@/lib/supabase/server";import { error } from "@/lib/api";
-export async function GET(req:Request,ctx:RouteContext<"/api/monitors/[id]/checks">){const {client,user}=await requireUser();if(!client||!user)return error("UNAUTHORIZED","Authentication required.",401);const {id}=await ctx.params;const page=Math.max(1,Number(new URL(req.url).searchParams.get("page"))||1),limit=50;const {data,error:e,count}=await client.from("monitor_checks").select("id,status,http_status,response_time_ms,error_code,created_at",{count:"exact"}).eq("monitor_id",id).order("created_at",{ascending:false}).range((page-1)*limit,page*limit-1);return e?error("CHECKS_NOT_FOUND","Could not load checks.",404):Response.json({data,meta:{page,limit,total:count}})}
+import { requireUser } from "@/lib/supabase/server";
+import { error } from "@/lib/api";
+
+export async function GET(
+  req: Request,
+  ctx: RouteContext<"/api/monitors/[id]/checks">,
+) {
+  const { client, user } = await requireUser();
+
+  if (!client || !user)
+    return error("UNAUTHORIZED", "Authentication required.", 401);
+
+  const { id } = await ctx.params;
+  const page = Math.max(
+      1,
+      Number(new URL(req.url).searchParams.get("page")) || 1,
+    ),
+    limit = 50;
+  const {
+    data,
+    error: e,
+    count,
+  } = await client
+    .from("monitor_checks")
+    .select("id,status,http_status,response_time_ms,error_code,created_at", {
+      count: "exact",
+    })
+    .eq("monitor_id", id)
+    .order("created_at", { ascending: false })
+    .range((page - 1) * limit, page * limit - 1);
+
+  return e
+    ? error("CHECKS_NOT_FOUND", "Could not load checks.", 404)
+    : Response.json({ data, meta: { page, limit, total: count } });
+}

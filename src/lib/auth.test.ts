@@ -1,9 +1,14 @@
 import { describe, expect, it } from "vitest";
 import { isAllowedGoogleUser, isAllowedUser } from "./auth";
+
 import type { User } from "@supabase/supabase-js";
 
 function user(email: string, provider: string) {
-  return { email, app_metadata: { provider, providers: [provider] }, identities: [{ provider }] } as unknown as User;
+  return {
+    email,
+    app_metadata: { provider, providers: [provider] },
+    identities: [{ provider }],
+  } as unknown as User;
 }
 
 describe("authentication providers", () => {
@@ -13,7 +18,9 @@ describe("authentication providers", () => {
   });
 
   it("keeps Google Workspace addresses out of the Google-only flow", () => {
-    expect(isAllowedGoogleUser(user("person@company.com", "google"))).toBe(false);
+    expect(isAllowedGoogleUser(user("person@company.com", "google"))).toBe(
+      false,
+    );
     expect(isAllowedUser(user("person@company.com", "google"))).toBe(false);
   });
 

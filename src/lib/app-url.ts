@@ -7,5 +7,6 @@ export function appOrigin(currentOrigin: string) {
       return current.origin;
     }
   } catch {}
+
   return PRODUCTION_ORIGIN;
 }

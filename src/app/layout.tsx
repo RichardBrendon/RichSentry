@@ -24,7 +24,10 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: { default: "RichSentry — Website & API monitoring", template: "%s · RichSentry" },
+  title: {
+    default: "RichSentry — Website & API monitoring",
+    template: "%s · RichSentry",
+  },
   description: "Know when your services fail. Before your users do.",
 };
 
@@ -35,8 +38,33 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <head><script dangerouslySetInnerHTML={{__html:`try{var t=localStorage.getItem('richsentry-theme');if(t!=='light'&&t!=='dark')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;document.documentElement.style.colorScheme=t}catch(e){document.documentElement.dataset.theme='light'}`}}/></head>
-      <body className="min-h-full flex flex-col">{children}<LanguageToggle/><ThemeToggle/></body>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              try {
+                var t = localStorage.getItem("richsentry-theme");
+
+                if (t !== "light" && t !== "dark") {
+                  t = matchMedia("(prefers-color-scheme: dark)").matches
+                    ? "dark"
+                    : "light";
+                }
+
+                document.documentElement.dataset.theme = t;
+                document.documentElement.style.colorScheme = t;
+              } catch (e) {
+                document.documentElement.dataset.theme = "light";
+              }
+            `,
+          }}
+        />
+      </head>
+      <body className="min-h-full flex flex-col">
+        {children}
+        <LanguageToggle />
+        <ThemeToggle />
+      </body>
     </html>
   );
 }

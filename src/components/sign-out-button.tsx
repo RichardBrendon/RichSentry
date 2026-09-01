@@ -11,13 +11,24 @@ export function SignOutButton({ compact = false }: { compact?: boolean }) {
 
   async function signOut() {
     setLoading(true);
+
     const client = browserClient();
+
     if (client) await client.auth.signOut();
+
     router.push("/");
     router.refresh();
   }
 
-  return <button type="button" className={compact ? "navSignOut" : "textButton signOutButton"} onClick={signOut} disabled={loading}>
-    {compact && <LogOut />}{loading ? "Signing out…" : "Sign out"}
-  </button>;
+  return (
+    <button
+      type="button"
+      className={compact ? "navSignOut" : "textButton signOutButton"}
+      onClick={signOut}
+      disabled={loading}
+    >
+      {compact && <LogOut />}
+      {loading ? "Signing out…" : "Sign out"}
+    </button>
+  );
 }

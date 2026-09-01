@@ -1,3 +1,106 @@
-import {adminClient} from "@/lib/supabase/admin";import {performCheck} from "./check";import {transition} from "./state";
-export type StoredMonitor={id:string;organization_id:string;name:string;url:string;type:"WEBSITE"|"API";method:"GET"|"POST"|"PUT"|"PATCH"|"HEAD";interval_seconds:number;timeout_ms:number;expected_status:number;response_threshold_ms:number;failures_before_incident:number;successes_before_recovery:number;encrypted_headers:Record<string,string>|null;status:"UP"|"DEGRADED"|"DOWN"|"PAUSED";consecutive_failures:number;consecutive_successes:number};
-export async function runMonitorCheck(monitor:StoredMonitor,now=new Date()){const db=adminClient();const check=await performCheck({name:monitor.name,url:monitor.url,type:monitor.type,method:monitor.method,intervalSeconds:monitor.interval_seconds,timeoutMs:monitor.timeout_ms,expectedStatus:monitor.expected_status,responseThresholdMs:monitor.response_threshold_ms,failuresBeforeIncident:monitor.failures_before_incident,successesBeforeRecovery:monitor.successes_before_recovery,headers:monitor.encrypted_headers??{}});const next=transition({status:monitor.status,consecutiveFailures:monitor.consecutive_failures,consecutiveSuccesses:monitor.consecutive_successes},check.status,monitor.failures_before_incident,monitor.successes_before_recovery);const {error:checkError}=await db.from("monitor_checks").insert({monitor_id:monitor.id,status:check.status,http_status:check.httpStatus,response_time_ms:check.responseTimeMs,error_code:check.error});if(checkError)throw checkError;const {error:updateError}=await db.from("monitors").update({status:next.status,consecutive_failures:next.consecutiveFailures,consecutive_successes:next.consecutiveSuccesses,last_checked_at:now.toISOString(),next_check_at:new Date(now.getTime()+monitor.interval_seconds*1000).toISOString(),locked_at:null}).eq("id",monitor.id);if(updateError)throw updateError;if(next.event==="monitor.down")await db.from("incidents").insert({monitor_id:monitor.id,organization_id:monitor.organization_id,title:`${monitor.name} is down`,cause:check.httpStatus?`HTTP ${check.httpStatus}`:check.error});if(next.event==="monitor.recovered")await db.from("incidents").update({status:"RESOLVED",resolved_at:now.toISOString()}).eq("monitor_id",monitor.id).neq("status","RESOLVED");console.info(JSON.stringify({event:"monitor.check.completed",monitorId:monitor.id,status:check.status,responseTimeMs:check.responseTimeMs}));return check}
+import { adminClient } from "@/lib/supabase/admin";
+import { performCheck } from "./check";
+import { transition } from "./state";
+
+export type StoredMonitor = {
+  id: string;
+  organization_id: string;
+  name: string;
+  url: string;
+  type: "WEBSITE" | "API";
+  method: "GET" | "POST" | "PUT" | "PATCH" | "HEAD";
+  interval_seconds: number;
+  timeout_ms: number;
+  expected_status: number;
+  response_threshold_ms: number;
+  failures_before_incident: number;
+  successes_before_recovery: number;
+  encrypted_headers: Record<string, string> | null;
+  status: "UP" | "DEGRADED" | "DOWN" | "PAUSED";
+  consecutive_failures: number;
+  consecutive_successes: number;
+};
+
+export async function runMonitorCheck(
+  monitor: StoredMonitor,
+  now = new Date(),
+) {
+  const db = adminClient();
+
+  const check = await performCheck({
+    name: monitor.name,
+    url: monitor.url,
+    type: monitor.type,
+    method: monitor.method,
+    intervalSeconds: monitor.interval_seconds,
+    timeoutMs: monitor.timeout_ms,
+    expectedStatus: monitor.expected_status,
+    responseThresholdMs: monitor.response_threshold_ms,
+    failuresBeforeIncident: monitor.failures_before_incident,
+    successesBeforeRecovery: monitor.successes_before_recovery,
+    headers: monitor.encrypted_headers ?? {},
+  });
+
+  const next = transition(
+    {
+      status: monitor.status,
+      consecutiveFailures: monitor.consecutive_failures,
+      consecutiveSuccesses: monitor.consecutive_successes,
+    },
+    check.status,
+    monitor.failures_before_incident,
+    monitor.successes_before_recovery,
+  );
+
+  const { error: checkError } = await db.from("monitor_checks").insert({
+    monitor_id: monitor.id,
+    status: check.status,
+    http_status: check.httpStatus,
+    response_time_ms: check.responseTimeMs,
+    error_code: check.error,
+  });
+
+  if (checkError) throw checkError;
+
+  const { error: updateError } = await db
+    .from("monitors")
+    .update({
+      status: next.status,
+      consecutive_failures: next.consecutiveFailures,
+      consecutive_successes: next.consecutiveSuccesses,
+      last_checked_at: now.toISOString(),
+      next_check_at: new Date(
+        now.getTime() + monitor.interval_seconds * 1000,
+      ).toISOString(),
+      locked_at: null,
+    })
+    .eq("id", monitor.id);
+
+  if (updateError) throw updateError;
+
+  if (next.event === "monitor.down")
+    await db.from("incidents").insert({
+      monitor_id: monitor.id,
+      organization_id: monitor.organization_id,
+      title: `${monitor.name} is down`,
+      cause: check.httpStatus ? `HTTP ${check.httpStatus}` : check.error,
+    });
+
+  if (next.event === "monitor.recovered")
+    await db
+      .from("incidents")
+      .update({ status: "RESOLVED", resolved_at: now.toISOString() })
+      .eq("monitor_id", monitor.id)
+      .neq("status", "RESOLVED");
+
+  console.info(
+    JSON.stringify({
+      event: "monitor.check.completed",
+      monitorId: monitor.id,
+      status: check.status,
+      responseTimeMs: check.responseTimeMs,
+    }),
+  );
+
+  return check;
+}

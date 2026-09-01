@@ -1,5 +1,67 @@
 import { lookup } from "node:dns/promises";
 import { isIP } from "node:net";
-const blockedHosts=new Set(["localhost","metadata.google.internal","metadata","instance-data","169.254.169.254"]);
-function blockedIp(ip:string){ const normalized=ip.replace(/^::ffff:/,""); if(normalized==="::1"||normalized==="0.0.0.0"||normalized.startsWith("fe80:")||normalized.startsWith("fc")||normalized.startsWith("fd"))return true; const p=normalized.split(".").map(Number); if(p.length!==4)return false; return p[0]===10||p[0]===127||p[0]===0||(p[0]===169&&p[1]===254)||(p[0]===192&&p[1]===168)||(p[0]===172&&p[1]>=16&&p[1]<=31)||(p[0]===100&&p[1]>=64&&p[1]<=127)||p[0]>=224; }
-export async function assertSafeUrl(raw:string){ const url=new URL(raw); if(!["http:","https:"].includes(url.protocol)||url.username||url.password)throw new Error("URL_NOT_ALLOWED"); const host=url.hostname.toLowerCase().replace(/\.$/,""); if(blockedHosts.has(host)||host.endsWith(".local")||host.endsWith(".internal"))throw new Error("HOST_NOT_ALLOWED"); const records=isIP(host)?[{address:host}]:await lookup(host,{all:true,verbatim:true}); if(!records.length||records.some(r=>blockedIp(r.address)))throw new Error("IP_NOT_ALLOWED"); return url; }
+
+const blockedHosts = new Set([
+  "localhost",
+  "metadata.google.internal",
+  "metadata",
+  "instance-data",
+  "169.254.169.254",
+]);
+
+function blockedIp(ip: string) {
+  const normalized = ip.replace(/^::ffff:/, "");
+
+  if (
+    normalized === "::1" ||
+    normalized === "0.0.0.0" ||
+    normalized.startsWith("fe80:") ||
+    normalized.startsWith("fc") ||
+    normalized.startsWith("fd")
+  )
+    return true;
+
+  const p = normalized.split(".").map(Number);
+
+  if (p.length !== 4) return false;
+
+  return (
+    p[0] === 10 ||
+    p[0] === 127 ||
+    p[0] === 0 ||
+    (p[0] === 169 && p[1] === 254) ||
+    (p[0] === 192 && p[1] === 168) ||
+    (p[0] === 172 && p[1] >= 16 && p[1] <= 31) ||
+    (p[0] === 100 && p[1] >= 64 && p[1] <= 127) ||
+    p[0] >= 224
+  );
+}
+
+export async function assertSafeUrl(raw: string) {
+  const url = new URL(raw);
+
+  if (
+    !["http:", "https:"].includes(url.protocol) ||
+    url.username ||
+    url.password
+  )
+    throw new Error("URL_NOT_ALLOWED");
+
+  const host = url.hostname.toLowerCase().replace(/\.$/, "");
+
+  if (
+    blockedHosts.has(host) ||
+    host.endsWith(".local") ||
+    host.endsWith(".internal")
+  )
+    throw new Error("HOST_NOT_ALLOWED");
+
+  const records = isIP(host)
+    ? [{ address: host }]
+    : await lookup(host, { all: true, verbatim: true });
+
+  if (!records.length || records.some((r) => blockedIp(r.address)))
+    throw new Error("IP_NOT_ALLOWED");
+
+  return url;
+}

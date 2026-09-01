@@ -1,9 +1,16 @@
 import { z } from "zod";
+
 export const monitorSchema = z.object({
   name: z.string().trim().min(2).max(80),
-  url: z.string().url().refine(v => ["http:","https:"].includes(new URL(v).protocol), "Only HTTP and HTTPS are supported"),
-  type: z.enum(["WEBSITE","API"]).default("WEBSITE"),
-  method: z.enum(["GET","POST","PUT","PATCH","HEAD"]).default("GET"),
+  url: z
+    .string()
+    .url()
+    .refine(
+      (v) => ["http:", "https:"].includes(new URL(v).protocol),
+      "Only HTTP and HTTPS are supported",
+    ),
+  type: z.enum(["WEBSITE", "API"]).default("WEBSITE"),
+  method: z.enum(["GET", "POST", "PUT", "PATCH", "HEAD"]).default("GET"),
   intervalSeconds: z.number().int().min(60).max(86400).default(300),
   timeoutMs: z.number().int().min(500).max(30000).default(5000),
   expectedStatus: z.number().int().min(100).max(599).default(200),

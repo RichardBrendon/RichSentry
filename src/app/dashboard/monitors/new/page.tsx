@@ -1,2 +1,26 @@
-import {redirect} from "next/navigation";import Link from "next/link";import {MonitorForm} from "@/components/monitor-form";import {requireUser} from "@/lib/supabase/server";import {ensureUserOrganization} from "@/lib/organizations";
-export default async function NewMonitorPage(){const {user}=await requireUser();if(!user)redirect("/login");await ensureUserOrganization(user);return <main className="simplePage"><Link href="/dashboard">← Dashboard</Link><small>MONITORS</small><h1>Add a monitor</h1><p className="pageIntro">RichSentry will validate this public endpoint on the server and begin checking it on the next worker run.</p><MonitorForm/></main>}
+import { redirect } from "next/navigation";
+import Link from "next/link";
+import { MonitorForm } from "@/components/monitor-form";
+import { requireUser } from "@/lib/supabase/server";
+import { ensureUserOrganization } from "@/lib/organizations";
+
+export default async function NewMonitorPage() {
+  const { user } = await requireUser();
+
+  if (!user) redirect("/login");
+
+  await ensureUserOrganization(user);
+
+  return (
+    <main className="simplePage">
+      <Link href="/dashboard">← Dashboard</Link>
+      <small>MONITORS</small>
+      <h1>Add a monitor</h1>
+      <p className="pageIntro">
+        RichSentry will validate this public endpoint on the server and begin
+        checking it on the next worker run.
+      </p>
+      <MonitorForm />
+    </main>
+  );
+}

@@ -25,20 +25,42 @@ export function DashboardNav({
         <span>R</span> RichSentry
       </Link>
       <nav>
-        <Link className={active === "overview" ? "active" : undefined} href="/dashboard">
+        <Link
+          className={active === "overview" ? "active" : undefined}
+          href="/dashboard"
+        >
           <LayoutDashboard /> Overview
         </Link>
-        <Link className={active === "monitors" ? "active" : undefined} href="/dashboard/monitors">
-          <Radio /> Monitors {monitorCount !== undefined && <small>{monitorCount}</small>}
+        <Link
+          className={active === "monitors" ? "active" : undefined}
+          href="/dashboard/monitors"
+        >
+          <Radio /> Monitors{" "}
+          {monitorCount !== undefined && <small>{monitorCount}</small>}
         </Link>
-        <Link className={active === "incidents" ? "active" : undefined} href="/dashboard/incidents">
-          <AlertTriangle /> Incidents {incidentCount !== undefined && <small>{incidentCount}</small>}
+        <Link
+          className={active === "incidents" ? "active" : undefined}
+          href="/dashboard/incidents"
+        >
+          <AlertTriangle /> Incidents{" "}
+          {incidentCount !== undefined && <small>{incidentCount}</small>}
         </Link>
-        <Link className={active === "status-pages" ? "active" : undefined} href="/dashboard/status-pages">
+        <Link
+          className={active === "status-pages" ? "active" : undefined}
+          href="/dashboard/status-pages"
+        >
           <Activity /> Status pages
         </Link>
       </nav>
-      <div className="navBottom"><Link className={`settings${active === "settings" ? " active" : ""}`} href="/dashboard/settings"><Settings /> Settings</Link><SignOutButton compact /></div>
+      <div className="navBottom">
+        <Link
+          className={`settings${active === "settings" ? " active" : ""}`}
+          href="/dashboard/settings"
+        >
+          <Settings /> Settings
+        </Link>
+        <SignOutButton compact />
+      </div>
     </aside>
   );
 }

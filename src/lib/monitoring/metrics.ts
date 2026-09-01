@@ -1,3 +1,30 @@
-export function uptime(values: Array<"UP"|"DEGRADED"|"DOWN">) { if (!values.length) return 100; const available = values.reduce((n,v)=>n+(v==="UP"?1:v==="DEGRADED"?.5:0),0); return Math.round(available/values.length*10000)/100; }
-export function percentile(values:number[], p:number) { if (!values.length) return 0; const sorted=[...values].sort((a,b)=>a-b); const index=Math.ceil(p/100*sorted.length)-1; return sorted[Math.max(0,index)]; }
-export function responseStats(values:number[]) { return { average: values.length?Math.round(values.reduce((a,b)=>a+b,0)/values.length):0, minimum:Math.min(...values)||0, maximum:Math.max(...values)||0, p50:percentile(values,50),p95:percentile(values,95),p99:percentile(values,99) }; }
+export function uptime(values: Array<"UP" | "DEGRADED" | "DOWN">) {
+  if (!values.length) return 100;
+
+  const available = values.reduce(
+    (n, v) => n + (v === "UP" ? 1 : v === "DEGRADED" ? 0.5 : 0),
+    0,
+  );
+
+  return Math.round((available / values.length) * 10000) / 100;
+}
+export function percentile(values: number[], p: number) {
+  if (!values.length) return 0;
+
+  const sorted = [...values].sort((a, b) => a - b);
+  const index = Math.ceil((p / 100) * sorted.length) - 1;
+
+  return sorted[Math.max(0, index)];
+}
+export function responseStats(values: number[]) {
+  return {
+    average: values.length
+      ? Math.round(values.reduce((a, b) => a + b, 0) / values.length)
+      : 0,
+    minimum: Math.min(...values) || 0,
+    maximum: Math.max(...values) || 0,
+    p50: percentile(values, 50),
+    p95: percentile(values, 95),
+    p99: percentile(values, 99),
+  };
+}

@@ -1,1 +1,33 @@
-import Link from "next/link";export default function SettingsPage(){return <main className="simplePage"><Link href="/dashboard">← Dashboard</Link><small>WORKSPACE</small><h1>Settings</h1><div className="settingsGrid">{["Profile","Organization","Team","Notifications","Webhooks","Security","API","Billing"].map((x,i)=><article key={x}><h2>{x}</h2><p>{i===7?"Free plan · Billing integration ready":"Manage your workspace configuration and access."}</p><button className="secondary">Configure</button></article>)}</div></main>}
+import Link from "next/link";
+
+export default function SettingsPage() {
+  return (
+    <main className="simplePage">
+      <Link href="/dashboard">← Dashboard</Link>
+      <small>WORKSPACE</small>
+      <h1>Settings</h1>
+      <div className="settingsGrid">
+        {[
+          "Profile",
+          "Organization",
+          "Team",
+          "Notifications",
+          "Webhooks",
+          "Security",
+          "API",
+          "Billing",
+        ].map((x, i) => (
+          <article key={x}>
+            <h2>{x}</h2>
+            <p>
+              {i === 7
+                ? "Free plan · Billing integration ready"
+                : "Manage your workspace configuration and access."}
+            </p>
+            <button className="secondary">Configure</button>
+          </article>
+        ))}
+      </div>
+    </main>
+  );
+}
