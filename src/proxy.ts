@@ -4,7 +4,7 @@ import { NextResponse, type NextRequest } from "next/server";
 export async function proxy(request: NextRequest) {
   const hostname = request.nextUrl.hostname;
   if (
-    process.env.NODE_ENV === "production" &&
+    process.env.VERCEL_ENV === "production" &&
     hostname.endsWith(".vercel.app") &&
     hostname !== "richsentry.vercel.app"
   ) {
