@@ -4,6 +4,7 @@ import "./globals.css";
 import "./app.css";
 import "./forms.css";
 import "./theme.css";
+import "./settings.css";
 import "./oauth.css";
 import "./dashboard-pages.css";
 import "./auth-email.css";
