@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { LayoutDashboard, LogOut, Settings, UserRound } from "lucide-react";
+import { LogOut, Settings, UserRound } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 import { browserClient } from "@/lib/supabase/browser";
@@ -69,10 +69,6 @@ export function AccountMenu({ email, name }: AccountMenuProps) {
             <span>{email}</span>
           </div>
           <div className="accountMenuLinks">
-            <Link href="/dashboard" role="menuitem" onClick={() => setOpen(false)}>
-              <LayoutDashboard aria-hidden="true" />
-              Dashboard
-            </Link>
             <Link
               href="/dashboard/settings"
               role="menuitem"
