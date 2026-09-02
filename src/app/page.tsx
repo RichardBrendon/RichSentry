@@ -9,7 +9,6 @@ import {
   Webhook,
 } from "lucide-react";
 import { requireUser } from "@/lib/supabase/server";
-import { SignOutButton } from "@/components/sign-out-button";
 
 const features = [
   [
@@ -61,12 +60,9 @@ export default async function Home({
         </div>
         <div className="navActions">
           {user ? (
-            <>
-              <SignOutButton />
-              <Link href="/dashboard" className="button">
-                Open dashboard
-              </Link>
-            </>
+            <Link href="/dashboard" className="button">
+              Open dashboard
+            </Link>
           ) : (
             <>
               <Link href="/login" className="textButton">

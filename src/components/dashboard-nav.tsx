@@ -6,7 +6,6 @@ import {
   Radio,
   Settings,
 } from "lucide-react";
-import { SignOutButton } from "@/components/sign-out-button";
 
 type DashboardNavProps = {
   active: "overview" | "monitors" | "incidents" | "status-pages" | "settings";
@@ -59,7 +58,6 @@ export function DashboardNav({
         >
           <Settings /> Settings
         </Link>
-        <SignOutButton compact />
       </div>
     </aside>
   );

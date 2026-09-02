@@ -11,8 +11,11 @@ import "./auth-email.css";
 import "./session.css";
 import "./demo.css";
 import "./language.css";
+import "./account-menu.css";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { LanguageToggle } from "@/components/language-toggle";
+import { AccountMenu } from "@/components/account-menu";
+import { requireUser } from "@/lib/supabase/server";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,7 +35,11 @@ export const metadata: Metadata = {
   description: "Know when your services fail. Before your users do.",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  const { user } = await requireUser();
+  const accountName =
+    user?.user_metadata.full_name ?? user?.user_metadata.name ?? "";
+
   return (
     <html
       lang="en"
@@ -63,6 +70,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       </head>
       <body className="min-h-full flex flex-col">
         {children}
+        {user && (
+          <AccountMenu email={user.email ?? ""} name={accountName} />
+        )}
         <LanguageToggle />
         <ThemeToggle />
       </body>
