@@ -9,7 +9,19 @@ import {
 import { ensureUserOrganization } from "@/lib/organizations";
 import { requireUser } from "@/lib/supabase/server";
 
-export default async function SettingsPage() {
+function safeReturnPath(value: string | undefined) {
+  if (!value?.startsWith("/") || value.startsWith("//")) return "/dashboard";
+  if (value.startsWith("/dashboard/settings")) return "/dashboard";
+
+  return value;
+}
+
+export default async function SettingsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ next?: string }>;
+}) {
+  const { next } = await searchParams;
   const { user } = await requireUser();
 
   if (!user) redirect("/login");
@@ -24,10 +36,11 @@ export default async function SettingsPage() {
     (identity) => identity.provider === "email",
   );
   const canManageOrganization = ["OWNER", "ADMIN"].includes(membership.role);
+  const returnPath = safeReturnPath(next);
 
   return (
     <main className="simplePage">
-      <Link href="/dashboard">← Dashboard</Link>
+      <Link href={returnPath}>← Back</Link>
       <small>WORKSPACE</small>
       <h1>Settings</h1>
       <p className="pageIntro">

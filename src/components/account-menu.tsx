@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { LogOut, Settings, UserRound } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 import { browserClient } from "@/lib/supabase/browser";
 
@@ -14,6 +14,7 @@ type AccountMenuProps = {
 
 export function AccountMenu({ email, name }: AccountMenuProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const menuRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
@@ -70,7 +71,7 @@ export function AccountMenu({ email, name }: AccountMenuProps) {
           </div>
           <div className="accountMenuLinks">
             <Link
-              href="/dashboard/settings"
+              href={`/dashboard/settings?next=${encodeURIComponent(pathname)}`}
               role="menuitem"
               onClick={() => setOpen(false)}
             >
