@@ -8,6 +8,8 @@ import {
   Settings,
 } from "lucide-react";
 
+import { requireUser } from "@/lib/supabase/server";
+
 const monitors = [
   {
     name: "RichSentry Website",
@@ -32,7 +34,9 @@ const monitors = [
   },
 ] as const;
 
-export default function DemoPage() {
+export default async function DemoPage() {
+  const { user } = await requireUser();
+
   return (
     <main className="appShell demoShell">
       <aside className="appNav">
@@ -61,7 +65,7 @@ export default function DemoPage() {
         <div className="demoBanner">
           <span>INTERACTIVE PREVIEW</span>
           <p>This page uses example data. No account is required.</p>
-          <Link href="/signup">Create free account</Link>
+          {!user && <Link href="/signup">Create free account</Link>}
         </div>
         <header>
           <div>
